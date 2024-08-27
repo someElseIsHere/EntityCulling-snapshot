@@ -1,13 +1,13 @@
 package dev.tr7zw.entityculling;
 
 import dev.tr7zw.util.ModLoaderUtil;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 //spotless:off 
 //#if FABRIC
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 //#elseif NEOFORGE
 //#if MC >= 12005
 //$$ import net.neoforged.neoforge.client.event.ClientTickEvent;

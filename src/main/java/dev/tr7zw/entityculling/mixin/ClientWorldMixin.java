@@ -30,7 +30,7 @@ public class ClientWorldMixin {
             return; // disabled
         }
         // Use abstract minecart instead of whitelist to also catch modded Minecarts
-        if (entity.noCulling || entity == mc.player || entity == mc.cameraEntity || entity.isPassenger()
+        if (entity == mc.player || entity == mc.cameraEntity || entity.isPassenger()
                 || entity.isVehicle() || (entity instanceof AbstractMinecart)) {
             EntityCullingModBase.instance.tickedEntities++;
             return; // never skip the client tick for the player or entities in vehicles/with

@@ -1,5 +1,6 @@
 package dev.tr7zw.entityculling.mixin;
 
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,29 +27,28 @@ public class WorldRendererMixin {
     private EntityRenderDispatcher entityRenderDispatcher;
 
     @Inject(at = @At("HEAD"), method = "renderEntity", cancellable = true)
-    private void renderEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickDelta,
-            PoseStack matrices, MultiBufferSource vertexConsumers, CallbackInfo info) {
+    private void renderEntity(Entity entity, double cameraX , double cameraY, double cameraZ, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, CallbackInfo info) {
         if (EntityCullingModBase.instance.config.skipEntityCulling) {
             return;
         }
         Cullable cullable = (Cullable) entity;
-        if (!cullable.isForcedVisible() && cullable.isCulled() && !entity.noCulling) {
+        if (!cullable.isForcedVisible() && cullable.isCulled()) {
             @SuppressWarnings("unchecked")
-            EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) entityRenderDispatcher.getRenderer(entity);
+            EntityRenderer<Entity,EntityRenderState> entityRenderer = (EntityRenderer<Entity, EntityRenderState>) entityRenderDispatcher.getRenderer(entity);
             @SuppressWarnings("unchecked")
-            EntityRendererInter<Entity> entityRendererInter = (EntityRendererInter<Entity>) entityRenderer;
+            EntityRendererInter<Entity, EntityRenderState> entityRendererInter = (EntityRendererInter<Entity, EntityRenderState>) entityRenderer;
             if (EntityCullingModBase.instance.config.renderNametagsThroughWalls && matrices != null
                     && vertexConsumers != null && entityRendererInter.shadowShouldShowName(entity)) {
                 double x = Mth.lerp((double) tickDelta, (double) entity.xOld, (double) entity.getX()) - cameraX;
                 double y = Mth.lerp((double) tickDelta, (double) entity.yOld, (double) entity.getY()) - cameraY;
                 double z = Mth.lerp((double) tickDelta, (double) entity.zOld, (double) entity.getZ()) - cameraZ;
-                Vec3 vec3d = entityRenderer.getRenderOffset(entity, tickDelta);
+                Vec3 vec3d = entityRenderer.getRenderOffset(entityRenderer.createRenderState());
                 double d = x + vec3d.x;
                 double e = y + vec3d.y;
                 double f = z + vec3d.z;
                 matrices.pushPose();
                 matrices.translate(d, e, f);
-                entityRendererInter.shadowRenderNameTag(entity, entity.getDisplayName(), matrices, vertexConsumers,
+                entityRendererInter.shadowRenderNameTag(entityRenderer.createRenderState(), entity.getDisplayName(), matrices, vertexConsumers,
                         this.entityRenderDispatcher.getPackedLightCoords(entity, tickDelta), tickDelta);
                 matrices.popPose();
             }

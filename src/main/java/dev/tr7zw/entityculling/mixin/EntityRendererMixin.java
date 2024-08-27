@@ -1,5 +1,6 @@
 package dev.tr7zw.entityculling.mixin;
 
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -12,16 +13,20 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 
 @Mixin(EntityRenderer.class)
-public abstract class EntityRendererMixin<T extends Entity> implements EntityRendererInter<T> {
+public abstract class EntityRendererMixin<T extends Entity, S extends EntityRenderState> implements EntityRendererInter<T, S> {
+
+    @Shadow protected abstract boolean shouldShowName(T entity, double d);
+
+    @Shadow protected abstract void renderNameTag(S entityRenderState, Component component, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, float f);
 
     @Override
     public boolean shadowShouldShowName(T entity) {
-        return shouldShowName(entity);
+        return shouldShowName(entity, 0);
     }
 
     @Override
-    public void shadowRenderNameTag(T entity, Component component, PoseStack poseStack,
-            MultiBufferSource multiBufferSource, int light, float f) {
+    public void shadowRenderNameTag(S entity, Component component, PoseStack poseStack,
+                                    MultiBufferSource multiBufferSource, int light, float f) {
         renderNameTag(entity, component, poseStack, multiBufferSource, light
         // spotless:off
                 //#if MC >= 12005
@@ -32,18 +37,5 @@ public abstract class EntityRendererMixin<T extends Entity> implements EntityRen
                 //spotless:on
     }
 
-    @Shadow
-    public abstract boolean shouldShowName(T entity);
-
-    @Shadow
-    public abstract void renderNameTag(T entity, Component component, PoseStack poseStack,
-            MultiBufferSource multiBufferSource, int i
-            // spotless:off
-          //#if MC >= 12005
-            , float f);
-          //#else
-          //$$);
-          //#endif
-          //spotless:on
 
 }
