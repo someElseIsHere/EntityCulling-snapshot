@@ -17,7 +17,8 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
 
     @Shadow protected abstract boolean shouldShowName(T entity, double d);
 
-    @Shadow protected abstract void renderNameTag(S entityRenderState, Component component, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, float f);
+
+    @Shadow protected abstract void renderNameTag(S entityRenderState, Component component, PoseStack poseStack, MultiBufferSource multiBufferSource, int i);
 
     @Override
     public boolean shadowShouldShowName(T entity) {
@@ -27,10 +28,7 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
     @Override
     public void shadowRenderNameTag(S entity, Component component, PoseStack poseStack,
                                     MultiBufferSource multiBufferSource, int light, float f) {
-        renderNameTag(entity, component, poseStack, multiBufferSource, light
-        // spotless:off
-                //#if MC >= 12005
-                    , f);
+        renderNameTag(entity, component, poseStack, multiBufferSource, light);
                 //#else
                 //$$);
                 //#endif
